@@ -1,0 +1,41 @@
+set( LIBRT_ROOT_DIR "" CACHE PATH "LIBRT root directory" )
+set( DETECTED_LIBRT_ROOT_DIR "" )
+if( NOT "${LIBRT_ROOT_DIR}" STREQUAL "" )
+  find_path( LIBRT_INCLUDE_DIR aio.h  PATHS ${LIBRT_ROOT_DIR}/include )
+  if( NOT "${LIBRT_INCLUDE_DIR}" STREQUAL "LIBRT_INCLUDE_DIR-NOTFOUND" )
+    set( DETECTED_LIBRT_ROOT_DIR ${LIBRT_ROOT_DIR} )
+  endif()
+endif()
+if( "${DETECTED_LIBRT_ROOT_DIR}" STREQUAL "" )
+  find_path( LIBRT_INCLUDE_DIR aio.h  PATHS /usr/include )
+  if( NOT "${LIBRT_INCLUDE_DIR}" STREQUAL "LIBRT_INCLUDE_DIR-NOTFOUND" )
+    set( DETECTED_LIBRT_ROOT_DIR /usr )
+  endif()
+endif()
+if( "${DETECTED_LIBRT_ROOT_DIR}" STREQUAL "" )
+  find_path( LIBRT_INCLUDE_DIR aio.h  PATHS /usr/local/include )
+  if( NOT "${LIBRT_INCLUDE_DIR}" STREQUAL "LIBRT_INCLUDE_DIR-NOTFOUND" )
+    set( DETECTED_LIBRT_ROOT_DIR /usr/local )
+  endif()
+endif()
+if( NOT "${DETECTED_LIBRT_ROOT_DIR}" STREQUAL "" )
+  find_library(LIBRT_LIBRARY rt HINTS ${DETECTED_LIBRT_ROOT_DIR}/lib )
+endif()
+find_package_handle_standard_args(librt DEFAULT_MSG
+  LIBRT_INCLUDE_DIR
+  LIBRT_LIBRARY
+)
+if(LIBRT_FOUND)
+set(
+  LIBRT_LIBRARIES
+  rt
+)
+set(LIBRT_LIBRARY_DIRS ${DETECTED_LIBRT_ROOT_DIR}/lib)
+endif(LIBRT_FOUND)
+mark_as_advanced(
+  LIBRT_INCLUDE_DIR
+  LIBRT_LIBRARIES
+  LIBRT_LIBRARY_DIRS
+  LIBRT_LIBRARY
+)
+
